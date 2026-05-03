@@ -1,0 +1,40 @@
+name: Weekly Calendar Cache Update
+
+on:
+  schedule:
+    # 每週一 23:00 台灣時間（15:00 UTC）
+    - cron: "0 15 * * 1"
+  workflow_dispatch:
+    # 允許手動觸發
+
+jobs:
+  update-cache:
+    name: Update Calendar Cache
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install dependencies
+        run: |
+          cd line-bot-firebase
+          npm install
+
+      - name: Update calendar cache
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          cd line-bot-firebase
+          node trigger-reminder.js --cache-only
+
+      - name: Log completion
+        run: |
+          echo "✅ Calendar cache updated successfully"
+          DATE=$(date -u +%Y-%m-%d)
+          echo "Cache updated on: $DATE"
