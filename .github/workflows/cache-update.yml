@@ -27,6 +27,8 @@ jobs:
       - name: Update calendar cache
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          ICAL_URL: ${{ secrets.ICAL_URL }}
+          LINE_TOKEN_BOT2: ${{ secrets.LINE_TOKEN_BOT2 }}
         run: |
           cd line-bot-firebase
           node trigger-reminder.js --cache-only
