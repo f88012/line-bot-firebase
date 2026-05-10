@@ -5,9 +5,16 @@ const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
-const envVars = require("./firebase.json").functions[0].environmentVariables;
-const ICAL_URL = envVars.GOOGLE_CALENDAR_ICAL_URL;
-const LINE_TOKEN = envVars.LINE_CHANNEL_ACCESS_TOKEN_BOT2;
+// In CI (GitHub Actions), firebase.json is gitignored — read from env vars instead
+let ICAL_URL, LINE_TOKEN;
+try {
+  const envVars = require("./firebase.json").functions[0].environmentVariables;
+  ICAL_URL = process.env.GOOGLE_CALENDAR_ICAL_URL || envVars.GOOGLE_CALENDAR_ICAL_URL;
+  LINE_TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN_BOT2 || envVars.LINE_CHANNEL_ACCESS_TOKEN_BOT2;
+} catch {
+  ICAL_URL = process.env.GOOGLE_CALENDAR_ICAL_URL;
+  LINE_TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN_BOT2;
+}
 const PROJECT = "news-english-ef2e4";
 
 function fbGet(dbPath) {
