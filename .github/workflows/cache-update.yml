@@ -10,8 +10,8 @@ jobs:
   update-cache:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
       - name: Install Firebase CLI
@@ -25,7 +25,7 @@ jobs:
           node trigger-reminder.js --cache-only
       - name: Upload logs
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cache-update-logs
           path: line-bot-firebase/cache-update-*.log
