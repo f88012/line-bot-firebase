@@ -2,39 +2,34 @@ name: Weekly Calendar Cache Update
 
 on:
   schedule:
-    # 每週一 23:00 台灣時間（15:00 UTC）
-    - cron: "0 15 * * 1"
+    # Every day at 07:00 Taiwan time (UTC 23:00 previous day)
+    - cron: '0 23 * * *'
   workflow_dispatch:
-    # 允許手動觸發
 
 jobs:
   update-cache:
-    name: Update Calendar Cache
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: "24"
-
+          node-version: '24'
+      - name: Install dependencies
+        run: |
+          cd line-bot-firebase
+          npm install
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
-
       - name: Update calendar cache
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          ICAL_URL: ${{ secrets.ICAL_URL }}
-          LINE_TOKEN_BOT2: ${{ secrets.LINE_TOKEN_BOT2 }}
         run: |
           cd line-bot-firebase
           node trigger-reminder.js --cache-only
-
-      - name: Log completion
-        run: |
-          echo "✅ Calendar cache updated successfully"
-          DATE=$(date -u +%Y-%m-%d)
-          echo "Cache updated on: $DATE"
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cache-update-logs
+          path: line-bot-firebase/cache-update-*.log
+          retention-days: 30
